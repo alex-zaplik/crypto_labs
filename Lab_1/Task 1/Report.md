@@ -54,7 +54,7 @@ ECR++DtJzxQ8FuWGjZMCFwYnXyGcz8NzMENGa/lNLrkQ9D0gutHw
 Now we can sign out better grade (`grade_better.txt`)
 
 ```bash
->   openssl dgst -md5 -sign private_key.pem -out grade_better.sign grade_better.txt
+>   openssl dgst -md5 -sign cakey.pem -out grade_better.sign grade_better.txt
 ```
 
 Get a public key from the certificate

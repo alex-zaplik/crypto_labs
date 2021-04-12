@@ -43,7 +43,7 @@ def egcd(a, b):
 # print(key_text)
 
 
-parser = argparse.ArgumentParser(description="Generate private key files from numerial data (p, q, e)")
+parser = argparse.ArgumentParser(description="Generate private key files from numeric data (p, q, e)")
 parser.add_argument('p', type=int, help="Larger prime factor")
 parser.add_argument('q', type=int, help="Smaller prime factor")
 parser.add_argument('e', type=int, help="Public exponent")
