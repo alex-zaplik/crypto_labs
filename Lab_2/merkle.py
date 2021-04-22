@@ -13,8 +13,6 @@ class SecurityParams:
     n: int  # Bit length of keys
     N: int  # Number of puzzles
 
-    p: int  # Number of workers
-
 
 def encrypt(msg, key):
     iv = get_random_bytes(16)
@@ -139,7 +137,7 @@ class Bob:
 
 
 if __name__ == "__main__":
-    params = SecurityParams(24, 2 ** 24, 3)
+    params = SecurityParams(24, 2 ** 24)
 
     print("Parameters:")
     print(f"\tPuzzle key size:\t{params.n} bits")
