@@ -1,0 +1,7 @@
+*.pyc
+*.p12
+*.pkcs12
+*.jks
+
+
+Lab_4/.vscode
