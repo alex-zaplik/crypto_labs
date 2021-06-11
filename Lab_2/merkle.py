@@ -213,7 +213,13 @@ class Bob:
 
 
 if __name__ == "__main__":
-    params = SecurityParams(24, 2 ** 24)
+    parser = argparse.ArgumentParser("Merkle Puzzle simulation script")
+    parser.add_argument("puzzle_key_size", type=int, help="The bit length of the puzzle keys")
+    parser.add_argument("puzzle_count_power", type=int, help="The number of puzzles to be used, given as 2^<input>")
+    args = parser.parse_args()
+
+    # params = SecurityParams(24, 2 ** 24)
+    params = SecurityParams(args.puzzle_key_size, 2 ** args.puzzle_count_power)
 
     print("Parameters:")
     print(f"\tPuzzle key size:\t{params.n} bits")
@@ -233,7 +239,7 @@ if __name__ == "__main__":
     crack_end = time.time()
     print()
 
-    alice.recive_id(id)
+    alice.receive_id(id)
     print()
 
     alice.finalize()

@@ -3,7 +3,7 @@
 ## Example use of the script
 
 ```
-> python .\merkle.py      
+> python merkle.py 24 24 
 Parameters:
         Puzzle key size:        24 bits 
         Number of puzzles:      16777216

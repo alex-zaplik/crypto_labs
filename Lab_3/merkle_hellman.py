@@ -85,7 +85,7 @@ def dec(cypher, priv_key):
 
 if __name__ == "__main__":
     # An example use of the crypto system
-    
+
     pt = b'Hello World!'
     priv_key, pub_key = generate(len(pt))
     ct = enc(pt, pub_key)
