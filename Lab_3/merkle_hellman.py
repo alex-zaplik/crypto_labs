@@ -8,7 +8,15 @@ PrivateKey = collections.namedtuple('PrivateKey', 'W q r inv_r n')
 
 
 def generate(n):
-    # Private key generation
+    """Private key generation with a super increasing series
+
+    Args:
+        n (int): The security parameter
+
+    Returns:
+        priv_key: The private key
+        pub_key: The public key
+    """
 
     W = []
 
@@ -34,6 +42,14 @@ def generate(n):
 
 
 def enc(msg, pub_key):
+    """Encrypts a message with the public key
+
+    Args:
+        pub_key: The public key
+    
+    Returns:
+        ct: The cyphertext
+    """
     msg_bits = list(map(int, bin(int(msg.hex(), base=16))[2:]))
     if len(msg_bits) % 8 != 0:
         msg_bits = [0] * (8 - (len(msg_bits) % 8)) + msg_bits
@@ -42,6 +58,14 @@ def enc(msg, pub_key):
 
 
 def dec(cypher, priv_key):
+    """Decrypts a message with the private key
+
+    Args:
+        priv_key: The private key
+    
+    Returns:
+        pt: The original plaintext
+    """
     c_prime = (cypher * priv_key.inv_r) % priv_key.q
     if c_prime < 0:
         c_prime += priv_key.q
@@ -60,6 +84,8 @@ def dec(cypher, priv_key):
 
 
 if __name__ == "__main__":
+    # An example use of the crypto system
+    
     pt = b'Hello World!'
     priv_key, pub_key = generate(len(pt))
     ct = enc(pt, pub_key)
