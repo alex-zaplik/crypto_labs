@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from multiprocessing import Pool
 
 import time
+import argparse
 
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes, random
@@ -12,6 +13,11 @@ from Crypto.Util import Padding
 class SecurityParams:
     n: int  # Bit length of keys
     N: int  # Number of puzzles
+
+
+######################################################################################################
+############################### Encryption and decryption with AES CBC ###############################
+######################################################################################################
 
 
 def encrypt(msg, key):
@@ -29,6 +35,11 @@ def decrypt(sec, key):
     return plaintext
 
 
+######################################################################################################
+############################### Representation of Alice in the protocol ##############################
+######################################################################################################
+
+
 class Alice:
     def __init__(self, params: SecurityParams, K: bytes):
         self.params = params
@@ -38,6 +49,17 @@ class Alice:
         self.K = K
 
     def prepare_puzzles(self):
+        """Generates a list of puzzles to be used in the protocol
+
+        Each puzzle is a message of the form "A message prefix" + id + key where
+        the 'id' is the index of a generated secure key in the key list and 'key'
+        is that secure key
+
+        Each puzzle is also encrypted with a 'params.n' bit key
+
+        Returns:
+            list: A shuffled list of encrypted puzzles
+        """
         print("Alice:\tPreparing puzzles")
 
         self.keys = []
@@ -59,20 +81,40 @@ class Alice:
 
         return self.messages
     
-    def recieve_id(self, id):
-        print(f"Alice:\tRecieved a puzzle id: {id}")
+    def receive_id(self, id):
+        """Receives an id from Bob and sets the appropriate session key
+
+        Args:
+            id (int): The decrypted id
+        """
+        print(f"Alice:\tReceived a puzzle id: {id}")
         self.key = self.keys[id]
 
     def finalize(self):
+        """Prints the status of the session after key exchange was completed
+        """
         print(f"Alice:\tCommunication key: {int.from_bytes(self.key, byteorder='big')}")
     
     def send(self, msg):
+        """Sends a message encrypted with the session key
+
+        Args:
+            msg (bytes): The message to be encrypted
+        
+        Returns:
+            ct (bytes): The cyphertext
+        """
         print(f"Alice:\tSending:\t{msg}")
         ct = encrypt(msg, self.key)
         print(f"\t\t\t{ct}")
         return ct
     
-    def recieve(self, msg):
+    def receive(self, msg):
+        """Receives and decrypts a message encrypted with the session key
+
+        Args:
+            msg (bytes): The encrypted message
+        """
         print(f"Alice:\tReceived:\t{msg}")
         print(f"\t\t\t{decrypt(msg, self.key)}")
     
@@ -89,12 +131,26 @@ class Alice:
         return mem
 
 
+######################################################################################################
+############################### Representation of Bob in the protocol ################################
+######################################################################################################
+
+
 class Bob:
     def __init__(self, params: SecurityParams):
         self.params = params
         self.key = 0
     
-    def recieve_secrets(self, secrets):
+    def receive_secrets(self, secrets):
+        """Chooses a random puzzle and decrypts it by brute force to
+        obtain the session key and its id
+
+        Args:
+            secrets (list): The list of puzzles
+        
+        Returns:
+            id (int): The id from the decrypted puzzle
+        """
         print(f"Bob:\tReceived {len(secrets)} puzzles")
         print("Bob:\tPicking a random puzzle")
         secret = secrets[random.randint(0, len(secrets) - 1)]
@@ -117,17 +173,37 @@ class Bob:
                 return id
 
     def finalize(self):
+        """Prints the status of the session after key exchange was completed
+        """
         print(f"Bob:\tCommunication key: {int.from_bytes(self.key, byteorder='big')}")
     
     def send(self, msg):
+        """Sends a message encrypted with the session key
+
+        Args:
+            msg (bytes): The message to be encrypted
+        
+        Returns:
+            ct (bytes): The cyphertext
+        """
         print(f"Bob:\tSending:\t{msg}")
         ct = encrypt(msg, self.key)
         print(f"\t\t\t{ct}")
         return ct
     
-    def recieve(self, msg):
+    def receive(self, msg):
+        """Receives and decrypts a message encrypted with the session key
+
+        Args:
+            msg (bytes): The encrypted message
+        """
         print(f"Bob:\tReceived:\t{msg}")
         print(f"\t\t\t{decrypt(msg, self.key)}")
+
+
+######################################################################################################
+########################## Time and data estimates for different parameters ##########################
+######################################################################################################
 
 
 # Puzzle count: 2 ** 16; Time:      2s; Message storage:   5.24 MB; Key storage:   2.09 MB
@@ -153,11 +229,11 @@ if __name__ == "__main__":
     print()
 
     crack_start = time.time()
-    id = bob.recieve_secrets(secrets)
+    id = bob.receive_secrets(secrets)
     crack_end = time.time()
     print()
 
-    alice.recieve_id(id)
+    alice.recive_id(id)
     print()
 
     alice.finalize()
@@ -166,12 +242,12 @@ if __name__ == "__main__":
 
     pt = Padding.pad(b'Hello Bob!', 32)
     ct = alice.send(pt)
-    bob.recieve(ct)
+    bob.receive(ct)
     print()
 
     pt = Padding.pad(b'Hello Alice!', 32)
     ct = bob.send(pt)
-    alice.recieve(ct)
+    alice.receive(ct)
     print()
 
     print(f"Puzzle memory usage:")
