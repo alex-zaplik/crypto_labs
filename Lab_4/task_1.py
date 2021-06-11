@@ -6,13 +6,15 @@ import sys
 import random
 import os
 
+from Crypto.Cipher import AES
+
 from libs import crypto_libs
 from libs import keystore_libs
 from libs import utils
 
 
 MODES_CHOICES = ('cbc', 'ecb', 'ofb')
-MODES_MAP = { 'cbc': 'aes-128-cbc', 'ecb': 'aes-128-ecb', 'ofb': 'aes-128-ofb' }
+MODES_MAP = { 'cbc': AES.MODE_CBC, 'ecb': AES.MODE_ECB, 'ofb': AES.MODE_OFB }
 
 OPERATION_ENC = 'enc'
 OPERATION_DEC = 'dec'

@@ -1,10 +1,11 @@
 import unittest
 import parameterized
 
+from Crypto.Cipher import AES
 from libs import crypto_libs, utils
 
 
-TESTED_MODES = ['aes-128-cbc', 'aes-128-ecb', 'aes-128-cfb']
+TESTED_MODES = [(AES.MODE_CBC, ), (AES.MODE_ECB, ), (AES.MODE_OFB, )]
 
 
 class CryptoLibsTests(unittest.TestCase):

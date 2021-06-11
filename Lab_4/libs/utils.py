@@ -11,7 +11,7 @@ def duplets(hex_input: str):
 
 
 def hex_from_bytes(bytes_input: bytes):
-    return hex(int.from_bytes(bytes_input, byteorder='big'))[2:]
+    return bytes_input.hex()
 
 
 def byte_from_hex(hex_input: str):

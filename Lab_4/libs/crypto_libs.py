@@ -2,8 +2,9 @@ import subprocess
 import random
 import pathlib
 import os
-import OpenSSL
 
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from typing import Text, List
 
 from config import settings
@@ -13,40 +14,30 @@ from libs import utils
 SIZE_OF_IV = 16
 
 
-def encrypt(data: bytes, secret: bytes, mode: Text, iv: bytes = None):
-    use_iv = mode != 'aes-128-ecb'
+def encrypt(data: bytes, secret: bytes, mode, iv: bytes = None):
+    use_iv = mode != AES.MODE_ECB
+    print(mode)
 
     if use_iv:
         iv = iv or bytes(random.randrange(0, 255) for _ in range(SIZE_OF_IV))
+        cipher = AES.new(secret, mode, iv)
+        return iv + cipher.encrypt(pad(data, 16))
 
-        command = f"openssl enc -e -{mode} -K {utils.hex_from_bytes(secret)} -iv {utils.hex_from_bytes(iv)}"
-        process = subprocess.run(['bash', '-c', command], input=data, stdout=subprocess.PIPE)
-
-        return process.stdout + iv
     else:
-        command = f"openssl enc -e -{mode} -K {utils.hex_from_bytes(secret)}"
-        process = subprocess.run(['bash', '-c', command], input=data, stdout=subprocess.PIPE)
-
-        return process.stdout
+        cipher = AES.new(secret, mode)
+        return cipher.encrypt(pad(data, 16))
 
 
-def decrypt(data: bytes, secret: bytes, mode: Text):
-    use_iv = mode != 'aes-128-ecb'
+def decrypt(data: bytes, secret: bytes, mode):
+    use_iv = mode != AES.MODE_ECB
 
     if use_iv:
-        iv = data[-SIZE_OF_IV:]
-        data = data[:-SIZE_OF_IV]
+        iv = data[:SIZE_OF_IV]
+        data = data[SIZE_OF_IV:]
 
-        command = f"openssl enc -d -{mode} -K {utils.hex_from_bytes(secret)} -iv {utils.hex_from_bytes(iv)}"
-        process = subprocess.run(['bash', '-c', command], input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if process.stderr:
-            return os.urandom(16)
-        return process.stdout
+        cipher = AES.new(secret, mode, iv)
+        return unpad(cipher.decrypt(data), 16)
+        
     else:
-        command = f"openssl enc -d -{mode} -K {utils.hex_from_bytes(secret)}"
-        process = subprocess.run(['bash', '-c', command], input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if process.stderr:
-            return os.urandom(16)
-        return process.stdout
+        cipher = AES.new(secret, mode)
+        return unpad(cipher.decrypt(data), 16)
