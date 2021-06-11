@@ -1,5 +1,15 @@
 # MD5 Collisions
 
+## Task
+
+People at Gras realized their mistake and they changed the way RSA key
+is generated.
+
+Fortunately for you they did not change the way the sign SignService works (except the name
+of the le)  they still use md5 for signing.
+
+(May be helpful: only the rst three lines of the les are read).
+
 ## Generating a collision
 
 Using a tool like HashClash we can perform a chosen prefix attack on the grade files:

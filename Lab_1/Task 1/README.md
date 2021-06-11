@@ -1,8 +1,16 @@
 # Getting the private key
 
+## Task
+
+The size (368-bits) of the RSA key is quite low. Try to nd a private key
+and generate the signature under a modied grade.txt le by yourself.
+
+You can use e.g., CADO-NFS http://cado-nfs.gforge.inria.fr/ or Msieve https://
+sourceforge.net/projects/msieve/ to factor the key.
+
 ## OpenSSL
 
-Use OpenSSL one the certificate (`cacertificate.pem`) to get the modulus and the public exponent
+Use OpenSSL on the certificate (`cacertificate.pem`) to get the modulus and the public exponent
 
 ```bash
 >   openssl x509 -in cacertificate.pem -noout -modulus
