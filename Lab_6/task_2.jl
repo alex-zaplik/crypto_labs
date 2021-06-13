@@ -1,27 +1,41 @@
-include("elgamal.jl")
+include("curves.jl")
 
-println("Using E-382:\n\t", E382Model)
 
-PubKey, PriKey = generate(E382Model)
+function test_curve(C::Curve)
+    model = C.Model
+    println("Using ", C.Name, ":\n\t", model)
 
-println("PubKey = ", PubKey)
-println("PriKey = ", PriKey)
+    PubKey, PriKey = generate(model)
 
-for i in 1:10
-    P = random_point(E382Model)
+    println("PubKey = ", PubKey)
+    println("PriKey = ", PriKey)
+    println()
 
-    println("Testing on:\n\t", P)
+    for i in 1:5
+        P = random_point(model)
 
-    C = encrypt(E382Model, PubKey, P)
-    Q = decrypt(E382Model, PriKey, C)
+        println("Testing on:\n\t", P)
 
-    if P == Q
-        println("Success!")
-    else
-        println("Values are different:")
-        println("\t", P)
-        println("\t", Q)
-        println("The cyphertext was:")
-        println("\t", C)
+        C = encrypt(model, PubKey, P)
+        Q = decrypt(model, PriKey, C)
+
+        if P == Q
+            println("Success!")
+        else
+            println("Values are different:")
+            println("\t", P)
+            println("\t", Q)
+            println("The cyphertext was:")
+            println("\t", C)
+        end
+
+        println()
     end
 end
+
+
+test_curve(E222)
+println()
+test_curve(E382)
+println()
+test_curve(E521)

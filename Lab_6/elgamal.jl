@@ -1,4 +1,4 @@
-include("e382.jl")
+include("edwards.jl")
 
 
 struct ElGamal
@@ -38,6 +38,3 @@ end
 function decrypt(Model::ElGamal, priKey::Number, Msg::Cypher)
     reflect(priKey * Msg.P) + Msg.Q
 end
-
-
-E382Model = ElGamal(E382Gen, E382Mod)
